@@ -31,7 +31,47 @@ export const Header = ({ fetchImages }: { fetchImages: Function }) => {
       if (canceled) {
         ToastAndroid.show('Operação cancelada', ToastAndroid.SHORT);
       } else {
-        return;
+        const filename = assets[0].uri.substring(
+          assets[0].uri.lastIndexOf('/') + 1,
+          assets[0].uri.length
+        );
+
+        const extend = filename.split('.')[1];
+        const formData = new FormData();
+        formData.append(
+          'file',
+          JSON.parse(
+            JSON.stringify({
+              name: filename,
+              uri: assets[0].uri,
+              type: 'image/' + extend,
+            })
+          )
+        );
+
+        try {
+          const response = await axios.post(
+            `http://${keys.IPMachineLocal}:8080/image`,
+            formData,
+            {
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+          if (response.data.error) {
+            Alert.alert(
+              'Erro',
+              'Não foi possivel enviar sua imagem. Por favor, tente novamente mais tarde!'
+            );
+          } else {
+            Alert.alert('Sucesso 🎉', 'Sua imagem foi enviada com sucesso!');
+            fetchImages();
+          }
+        } catch (err) {
+          alert('Erro ao enviar sua imagem');
+        }
       }
     }
   };

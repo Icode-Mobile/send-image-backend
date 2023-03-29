@@ -14,7 +14,9 @@ export default function App() {
   const [images, setImages] = useState<Array<string>>([]);
 
   async function fetchImages() {
-    return;
+    const response = await fetch(`http://${keys.IPMachineLocal}:8080/image`);
+    const json = await response.json();
+    setImages(json);
   }
 
   useEffect(() => {
